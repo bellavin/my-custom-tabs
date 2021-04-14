@@ -38,7 +38,7 @@
 		var currentCat = catElems[currentTab.dataset.customTab];
 		currentCat.classList.add('fadeOut');
 
-		tabElems.forEach((tabElem) => {
+		tabElems.forEach(function(tabElem) {
 			var catElem = catElems[tabElem.dataset.customTab];
 			catElem.classList.add('fade');
 			if (catElem !== currentCat) {
@@ -69,3 +69,144 @@
 		});
 	});
 })();
+
+
+  function debounce(f, ms) {
+    var isCooldown = false;
+    return function() {
+      if (isCooldown) return;
+      f.apply(this, arguments);
+      isCooldown = true;
+      setTimeout(function() {
+        isCooldown = false;
+      }, ms);
+    };
+  }
+
+  function throttle(func, ms) {
+    var isThrottled = false;
+    var savedArgs;
+    var savedThis;
+
+    function wrapper() {
+      if (isThrottled) {
+        savedArgs = arguments;
+        savedThis = this;
+        return;
+      }
+      func.apply(this, arguments);
+      isThrottled = true;
+      setTimeout(function() {
+        isThrottled = false;
+        if (savedArgs) {
+          wrapper.apply(savedThis, savedArgs);
+          savedArgs = savedThis = null;
+        }
+      }, ms);
+    }
+    return wrapper;
+  }
+
+  function slideUp(elem, duration) {
+    elem.style.setProperty('will-change', 'height, margin, padding');
+    elem.style.setProperty('transition-property', 'height, margin, padding');
+    elem.style.setProperty('transition-duration', duration + 'ms');
+
+    elem.style.setProperty('height', elem.offsetHeight + 'px');
+    elem.offsetHeight;
+    elem.style.setProperty('overflow', 'hidden');
+    elem.style.setProperty('height', '0');
+    elem.style.setProperty('padding-top', '0');
+    elem.style.setProperty('padding-bottom', '0');
+    elem.style.setProperty('margin-top', '0');
+    elem.style.setProperty('margin-bottom', '0');
+
+    window.setTimeout(function() {
+      elem.style.setProperty('display', 'none');
+      elem.style.removeProperty('height');
+      elem.style.removeProperty('padding-top');
+      elem.style.removeProperty('padding-bottom');
+      elem.style.removeProperty('margin-top');
+      elem.style.removeProperty('margin-bottom');
+      elem.style.removeProperty('overflow');
+
+      elem.style.removeProperty('transition-duration');
+      elem.style.removeProperty('transition-property');
+      elem.style.removeProperty('will-change');
+    }, duration);
+  }
+
+  function slideDown(elem, duration) {
+    elem.style.removeProperty('display');
+    var display = window.getComputedStyle(elem).display;
+
+    if (display === 'none') {
+      display = 'block';
+    }
+
+    elem.style.display = display;
+    var height = elem.offsetHeight;
+    elem.style.overflow = 'hidden';
+    elem.style.setProperty('overflow', 'hidden');
+    elem.style.setProperty('height', '0');
+    elem.style.setProperty('padding-top', '0');
+    elem.style.setProperty('padding-bottom', '0');
+    elem.style.setProperty('margin-top', '0');
+    elem.style.setProperty('margin-bottom', '0');
+    elem.offsetHeight;
+
+    elem.style.setProperty('will-change', 'height, margin, padding');
+    elem.style.setProperty('transition-property', 'height, margin, padding');
+    elem.style.setProperty('transition-duration', duration + 'ms');
+
+    elem.style.setProperty('height', height + 'px');
+    elem.style.removeProperty('padding-top');
+    elem.style.removeProperty('padding-bottom');
+    elem.style.removeProperty('margin-top');
+    elem.style.removeProperty('margin-bottom');
+    window.setTimeout(function() {
+      elem.style.removeProperty('height');
+      elem.style.removeProperty('overflow');
+      elem.style.removeProperty('transition-duration');
+      elem.style.removeProperty('transition-property');
+      elem.style.removeProperty('will-change');
+    }, duration);
+  }
+
+  // Menu scroll
+  // ---------------------------------
+  (function () {
+    var isIE11 = !!window.MSInputMethodContext && !!document.documentMode;
+
+    if (!isIE11) {
+      var elems = document.querySelectorAll('a[href^="#"]');
+
+      if (elems.length > 0) {
+        [].forEach.call(elems, function(elem) {
+          var href = elem.getAttribute('href');
+          var target = 0;
+
+
+          var onClick = debounce(function() {
+            if (href !== '#') {
+              var id = elem.getAttribute('href').substring(1);
+              var targetElem = document.getElementById(id);
+              var headerHeight = document.querySelector('.js-header-wrapper').offsetHeight;
+              target = targetElem.offsetTop - headerHeight;
+            }
+
+            window.scrollTo({
+              top: target,
+              behavior: 'smooth'
+            });
+          }, 1000);
+
+          elem.addEventListener('click', function(evt) {
+              evt.preventDefault();
+              onClick();
+          });
+        });
+      }
+    }
+
+  }());
